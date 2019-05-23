@@ -3,7 +3,8 @@ Add-Type -AssemblyName System.Windows.Forms
 
 Set-Location $env:TEMP
 
-if(-Not (Test-Path "vridge-preview-installer")){
+if(-Not (Test-Path "vridge-preview-installer"))
+{
     mkdir "vridge-preview-installer"
 }
 
@@ -31,20 +32,24 @@ if(-Not (Test-Path .\platform-tools\adb.exe))
 Write-Output "Testing if Quest is connected."
 $deviceStatus = .\platform-tools\adb.exe devices -l | Out-String    
 
-if($deviceStatus.Contains("Quest")){
+if($deviceStatus.Contains("Quest"))
+{
 
-    if((.\platform-tools\adb.exe shell pm list packages com.riftcat.vridgeoculus.beta.beta | Out-String).Length -gt 0){
+    if((.\platform-tools\adb.exe shell pm list packages com.riftcat.vridgeoculus.beta.beta | Out-String).Length -gt 0)
+    {
         Write-Output "Unnstalling current version."
         .\platform-tools\adb.exe uninstall com.riftcat.vridgeoculus.beta.beta
     }
 
     Write-Output "Installing."
-    $installResult = .\platform-tools\adb.exe install -g vridge.apk | Out-String
+    $installResult = .\platform-tools\adb.exe install vridge.apk | Out-String
 
-    if($installResult.Contains("Success")){
+    if($installResult.Contains("Success"))
+    {
         [System.Windows.Forms.MessageBox]::Show("VRidge for Quest preview installed.", "Success", "Ok", "Information");    
     }
-    else{
+    else
+    {
         [System.Windows.Forms.MessageBox]::Show("Unexpected error during installation. Please contact support@riftcat.com.", "Error", "Ok", "Error");    
     }
     
