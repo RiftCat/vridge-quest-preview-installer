@@ -10,12 +10,9 @@ if(-Not (Test-Path "vridge-preview-installer"))
 
 Set-Location vridge-preview-installer
 
-if(-Not (Test-Path vridge.apk))
-{
-    Write-Output "Downloading vridge.apk. This should take less than a minute."
-    $latestURL = (Invoke-WebRequest -Uri "https://go.riftcat.com/VRidgeQuestPreview" -MaximumRedirection 0 -ErrorAction SilentlyContinue).Headers.Location
-    Start-BitsTransfer $latestURL -Destination vridge.apk
-}
+Write-Output "Downloading vridge.apk. This should take less than a minute."
+$latestURL = (Invoke-WebRequest -Uri "https://go.riftcat.com/VRidgeQuestPreview" -MaximumRedirection 0 -ErrorAction SilentlyContinue).Headers.Location
+Start-BitsTransfer $latestURL -Destination vridge.apk
 
 if(-Not (Test-Path adb.zip))
 {
@@ -35,10 +32,10 @@ $deviceStatus = .\platform-tools\adb.exe devices -l | Out-String
 if($deviceStatus.Contains("Quest"))
 {
 
-    if((.\platform-tools\adb.exe shell pm list packages com.riftcat.vridgeoculus.beta.beta | Out-String).Length -gt 0)
+    if((.\platform-tools\adb.exe shell pm list packages com.riftcat.vridgeoculus.beta | Out-String).Length -gt 0)
     {
         Write-Output "Unnstalling current version."
-        .\platform-tools\adb.exe uninstall com.riftcat.vridgeoculus.beta.beta
+        .\platform-tools\adb.exe uninstall com.riftcat.vridgeoculus.beta
     }
 
     Write-Output "Installing."
