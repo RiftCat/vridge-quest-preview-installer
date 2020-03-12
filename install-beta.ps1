@@ -10,12 +10,9 @@ if(-Not (Test-Path "vridge-preview-installer"))
 
 Set-Location vridge-preview-installer
 
-if(-Not (Test-Path vridge.apk))
-{
-    Write-Output "Downloading vridge.apk. This should take less than a minute."
-    $latestURL = (Invoke-WebRequest -Uri "https://go.riftcat.com/VRidgeQuestBeta" -MaximumRedirection 0 -ErrorAction SilentlyContinue).Headers.Location
-    Start-BitsTransfer $latestURL -Destination vridge.apk
-}
+Write-Output "Downloading vridge.apk. This should take less than a minute."
+$latestURL = (Invoke-WebRequest -Uri "https://go.riftcat.com/VRidgeQuestBeta" -MaximumRedirection 0 -ErrorAction SilentlyContinue).Headers.Location
+Start-BitsTransfer $latestURL -Destination vridge.apk
 
 if(-Not (Test-Path adb.zip))
 {
