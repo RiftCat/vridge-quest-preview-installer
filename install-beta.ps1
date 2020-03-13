@@ -14,32 +14,36 @@ Write-Output "Downloading vridge.apk. This should take less than a minute."
 $latestURL = (Invoke-WebRequest -Uri "https://go.riftcat.com/VRidgeQuestBeta" -MaximumRedirection 0 -ErrorAction SilentlyContinue).Headers.Location
 Start-BitsTransfer $latestURL -Destination vridge.apk
 
-if(-Not (Test-Path adb.zip))
-{
-    Write-Output "Downloading ADB. This should take less than a minute."
-    Start-BitsTransfer "https://dl.google.com/android/repository/platform-tools-latest-windows.zip" -Destination adb.zip
-}
+if ($null -eq (Get-Command "adb.exe" -ErrorAction SilentlyContinue)) { # checks that adb isn't already availible
 
-if(-Not (Test-Path .\platform-tools\adb.exe))
-{
-    Write-Output "Unpacking."
-    Expand-Archive adb.zip -DestinationPath .
+    if (-Not (Test-Path adb.zip)) {
+        Write-Output "Downloading ADB. This should take less than a minute."
+        Start-BitsTransfer "https://dl.google.com/android/repository/platform-tools-latest-windows.zip" -Destination adb.zip
+    }
+
+    if (-Not (Test-Path .\platform-tools\adb.exe)) {
+        Write-Output "Unpacking."
+        Expand-Archive adb.zip -DestinationPath .
+    }
+
+    $env:path += ";.\platform-tools" # adds the downloaded adb to the PATH for this session
+
 }
 
 Write-Output "Testing if Quest is connected."
-$deviceStatus = .\platform-tools\adb.exe devices -l | Out-String    
+$deviceStatus = adb.exe devices -l | Out-String    
 
 if($deviceStatus.Contains("Quest"))
 {
 
-    if((.\platform-tools\adb.exe shell pm list packages com.riftcat.vridgeoculus.beta.beta | Out-String).Length -gt 0)
+    if((adb.exe shell pm list packages com.riftcat.vridgeoculus.beta.beta | Out-String).Length -gt 0)
     {
         Write-Output "Unnstalling current version."
-        .\platform-tools\adb.exe uninstall com.riftcat.vridgeoculus.beta.beta
+        adb.exe uninstall com.riftcat.vridgeoculus.beta.beta
     }
 
     Write-Output "Installing."
-    $installResult = .\platform-tools\adb.exe install vridge.apk | Out-String
+    $installResult = adb.exe install vridge.apk | Out-String
 
     if($installResult.Contains("Success"))
     {
