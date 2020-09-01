@@ -1,4 +1,4 @@
-Add-Type -AssemblyName System.Windows.Forms
+d-Type -AssemblyName System.Windows.Forms
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 Set-Location $env:TEMP
@@ -9,9 +9,9 @@ if (-Not (Test-Path "vridge-preview-installer")) {
 
 Set-Location vridge-preview-installer
 
-Write-Output "Downloading vridge.apk. This should take less than a minute."
-$latestURL = (Invoke-WebRequest -Uri "https://go.riftcat.com/VRidgeQuestPreview" -MaximumRedirection 0 -ErrorAction SilentlyContinue).Headers.Location
-Start-BitsTransfer $latestURL -Destination vridge.apk
+Write-Output "Downloading VRidgeQuest20602-stable.apk. This should take less than a minute."
+$latestURL = (Invoke-WebRequest -Uri "shorturl.at/npwEU" -MaximumRedirection 0 -ErrorAction SilentlyContinue).Headers.Location
+Start-BitsTransfer $latestURL -Destination VRidgeQuest20602-stable.apk
 
 if ($null -eq (Get-Command "adb.exe" -ErrorAction SilentlyContinue)) { # checks that adb isn't already availible
 
