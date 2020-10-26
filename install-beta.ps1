@@ -2,6 +2,7 @@ Add-Type -AssemblyName System.Windows.Forms
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 Set-Location $env:TEMP
+$ProgressPreference = 'SilentlyContinue'
 
 if(-Not (Test-Path "vridge-preview-installer"))
 {
@@ -11,11 +12,9 @@ if(-Not (Test-Path "vridge-preview-installer"))
 Set-Location vridge-preview-installer
 
 Write-Output "Downloading vridge.apk. This should take less than a minute."
-$latestURL = (Invoke-WebRequest -Uri "https://go.riftcat.com/VRidgeQuestBeta" -MaximumRedirection 0 -ErrorAction SilentlyContinue).Headers.Location
-Start-BitsTransfer $latestURL -Destination vridge.apk
+Invoke-WebRequest -Uri "https://go.riftcat.com/VRidgeQuestBeta" -UseBasicParsing -MaximumRedirection 1 -OutFile vridge.apk
 
 if ($null -eq (Get-Command "adb.exe" -ErrorAction SilentlyContinue)) { # checks that adb isn't already availible
-
     if (-Not (Test-Path adb.zip)) {
         Write-Output "Downloading ADB. This should take less than a minute."
         Start-BitsTransfer "https://dl.google.com/android/repository/platform-tools-latest-windows.zip" -Destination adb.zip
@@ -27,7 +26,6 @@ if ($null -eq (Get-Command "adb.exe" -ErrorAction SilentlyContinue)) { # checks 
     }
 
     $env:path += ";.\platform-tools" # adds the downloaded adb to the PATH for this session
-
 }
 
 Write-Output "Testing if Quest is connected."
@@ -35,7 +33,6 @@ $deviceStatus = adb.exe devices -l | Out-String
 
 if($deviceStatus.Contains("Quest"))
 {
-
     if((adb.exe shell pm list packages com.riftcat.vridgeoculus.beta.beta | Out-String).Length -gt 0)
     {
         Write-Output "Unnstalling current version."
@@ -53,7 +50,6 @@ if($deviceStatus.Contains("Quest"))
     {
         [System.Windows.Forms.MessageBox]::Show("Unexpected error during installation. Please contact support@riftcat.com.", "Error", "Ok", "Error");    
     }
-    
 }
 elseif($deviceStatus.Contains("unauthorized"))
 {
