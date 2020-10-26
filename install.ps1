@@ -2,6 +2,7 @@ Add-Type -AssemblyName System.Windows.Forms
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 Set-Location $env:TEMP
+$ProgressPreference = 'SilentlyContinue'
 
 if (-Not (Test-Path "vridge-preview-installer")) {
     mkdir "vridge-preview-installer"
@@ -10,8 +11,7 @@ if (-Not (Test-Path "vridge-preview-installer")) {
 Set-Location vridge-preview-installer
 
 Write-Output "Downloading vridge.apk. This should take less than a minute."
-$latestURL = (Invoke-WebRequest -Uri "https://go.riftcat.com/VRidgeQuestPreview" -MaximumRedirection 0 -ErrorAction SilentlyContinue).Headers.Location
-Start-BitsTransfer $latestURL -Destination vridge.apk
+Invoke-WebRequest -Uri "https://go.riftcat.com/VRidgeQuestPreview" -UseBasicParsing -MaximumRedirection 1 -OutFile vridge.apk
 
 if ($null -eq (Get-Command "adb.exe" -ErrorAction SilentlyContinue)) { # checks that adb isn't already availible
 
@@ -33,7 +33,6 @@ Write-Output "Testing if Quest is connected."
 $deviceStatus = adb.exe devices -l | Out-String    
 
 if ($deviceStatus.Contains("Quest")) {
-
     if ((adb.exe shell pm list packages com.riftcat.vridgeoculus.beta | Out-String).Length -gt 0) {
         Write-Output "Unnstalling current version."
         adb.exe uninstall com.riftcat.vridgeoculus.beta
@@ -47,8 +46,7 @@ if ($deviceStatus.Contains("Quest")) {
     }
     else {
         [System.Windows.Forms.MessageBox]::Show("Unexpected error during installation. Please contact support@riftcat.com.", "Error", "Ok", "Error");    
-    }
-    
+    }    
 }
 elseif ($deviceStatus.Contains("unauthorized")) {
     [System.Windows.Forms.MessageBox]::Show("Your device is connected but you need to confirm the developer prompt inside the headset first. Please put on your headset while the device is connected and confirm the connecion in VR, then paste this script again.", "Error", "Ok", "Warning");    
